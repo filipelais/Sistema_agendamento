@@ -10,7 +10,6 @@ if ($id <= 0) {
     exit;
 }
 
-// Carrega o paciente
 $stmt = $pdo->prepare("SELECT * FROM pacientes WHERE id = :id");
 $stmt->execute([':id' => $id]);
 $paciente = $stmt->fetch();
@@ -108,10 +107,51 @@ require_once __DIR__ . '/../includes/header.php';
 
                     <div class="mb-3">
                         <label class="form-label">Nome completo *</label>
-                        <input type="text"
-                               name="nome"
-                               class="form-control <?= isset($erros['nome']) ? 'is-invalid' : '' ?>"
-                               value="<?= e($dados['nome']) ?>"
-                               required>
+                        <input type="text" name="nome" class="form-control <?= isset($erros['nome']) ? 'is-invalid' : '' ?>" value="<?= e($dados['nome']) ?>" required>
                         <?php if (isset($erros['nome'])): ?>
-                            <div class="invalid-feedback"><?= e($erros
+                            <div class="invalid-feedback"><?= e($erros['nome']) ?></div>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">CPF *</label>
+                            <input type="text" name="cpf" class="form-control <?= isset($erros['cpf']) ? 'is-invalid' : '' ?>" value="<?= e(formatarCpf($dados['cpf'])) ?>" maxlength="14" required>
+                            <?php if (isset($erros['cpf'])): ?>
+                                <div class="invalid-feedback"><?= e($erros['cpf']) ?></div>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Data de nascimento *</label>
+                            <input type="date" name="data_nascimento" class="form-control <?= isset($erros['data_nascimento']) ? 'is-invalid' : '' ?>" value="<?= e($dados['data_nascimento']) ?>" required>
+                            <?php if (isset($erros['data_nascimento'])): ?>
+                                <div class="invalid-feedback"><?= e($erros['data_nascimento']) ?></div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Telefone</label>
+                            <input type="text" name="telefone" class="form-control" value="<?= e($dados['telefone']) ?>">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">E-mail</label>
+                            <input type="email" name="email" class="form-control <?= isset($erros['email']) ? 'is-invalid' : '' ?>" value="<?= e($dados['email']) ?>">
+                            <?php if (isset($erros['email'])): ?>
+                                <div class="invalid-feedback"><?= e($erros['email']) ?></div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Salvar alterações</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>

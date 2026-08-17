@@ -1,0 +1,4 @@
+config/conexao.php
+setup.php
+*.log
+.vscode/

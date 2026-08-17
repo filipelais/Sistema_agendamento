@@ -79,3 +79,52 @@ function validarCsrf(?string $token): bool {
 function e(?string $texto): string {
     return htmlspecialchars($texto ?? '', ENT_QUOTES, 'UTF-8');
 }
+/**
+ * Verifica se já existe agendamento conflitante para o profissional
+ * no intervalo informado.
+ *
+ * Dois atendimentos conflitam quando seus intervalos se sobrepõem.
+ * Agendamentos cancelados são ignorados.
+ *
+ * @param int|null $ignorarId ID a desconsiderar (usado na edição)
+ */
+function existeConflito(
+    PDO $pdo,
+    int $usuarioId,
+    string $dataHora,
+    int $duracaoMinutos,
+    ?int $ignorarId = null
+): bool {
+    $sql = "SELECT COUNT(*) AS total
+            FROM agendamentos
+            WHERE usuario_id = :usuario_id
+              AND status <> 'cancelado'
+              AND :inicio < DATE_ADD(data_hora, INTERVAL duracao_minutos MINUTE)
+              AND DATE_ADD(:inicio, INTERVAL :duracao MINUTE) > data_hora";
+
+    if ($ignorarId !== null) {
+        $sql .= " AND id <> :ignorar_id";
+    }
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':usuario_id', $usuarioId, PDO::PARAM_INT);
+    $stmt->bindValue(':inicio', $dataHora);
+    $stmt->bindValue(':duracao', $duracaoMinutos, PDO::PARAM_INT);
+
+    if ($ignorarId !== null) {
+        $stmt->bindValue(':ignorar_id', $ignorarId, PDO::PARAM_INT);
+    }
+
+    $stmt->execute();
+
+    return (int) $stmt->fetch()['total'] > 0;
+}
+
+/**
+ * Retorna a lista de profissionais ativos para seleção.
+ */
+function listarProfissionais(PDO $pdo): array {
+    return $pdo->query(
+        "SELECT id, nome FROM usuarios WHERE ativo = TRUE ORDER BY nome ASC"
+    )->fetchAll();
+}

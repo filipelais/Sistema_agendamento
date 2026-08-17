@@ -27,16 +27,7 @@ if ($filtroProfissional > 0) {
 
 $where = $condicoes ? 'WHERE ' . implode(' AND ', $condicoes) : '';
 
-$sql = "SELECT
-            a.id,
-            a.data_hora,
-            a.duracao_minutos,
-            a.tipo_atendimento,
-            a.status,
-            a.observacoes,
-            p.nome AS paciente_nome,
-            p.cpf AS paciente_cpf,
-            u.nome AS profissional_nome
+$sql = "SELECT a.id, a.data_hora, a.duracao_minutos, a.tipo_atendimento, a.status, a.observacoes, p.nome AS paciente_nome, p.cpf AS paciente_cpf, u.nome AS profissional_nome
         FROM agendamentos a
         INNER JOIN pacientes p ON p.id = a.paciente_id
         INNER JOIN usuarios u ON u.id = a.usuario_id
@@ -49,12 +40,7 @@ $agendamentos = $stmt->fetchAll();
 
 $profissionais = listarProfissionais($pdo);
 
-// Cores do badge conforme o status
-$corStatus = [
-    'agendado'  => 'primary',
-    'realizado' => 'success',
-    'cancelado' => 'secondary'
-];
+$corStatus = ['agendado' => 'primary', 'realizado' => 'success', 'cancelado' => 'secondary'];
 
 $titulo = 'Agendamentos';
 require_once __DIR__ . '/../includes/header.php';
@@ -67,14 +53,7 @@ require_once __DIR__ . '/../includes/header.php';
 
 <?php if (isset($_GET['sucesso'])): ?>
     <div class="alert alert-success alert-dismissible fade show">
-        <?php
-        $mensagens = [
-            'cadastrado' => 'Agendamento registrado com sucesso.',
-            'atualizado' => 'Agendamento atualizado com sucesso.',
-            'status'     => 'Situação do agendamento atualizada.'
-        ];
-        echo e($mensagens[$_GET['sucesso']] ?? 'Operação realizada.');
-        ?>
+        <?php $mensagens = ['cadastrado' => 'Agendamento registrado com sucesso.', 'atualizado' => 'Agendamento atualizado com sucesso.', 'status' => 'Situação do agendamento atualizada.']; echo e($mensagens[$_GET['sucesso']] ?? 'Operação realizada.'); ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
@@ -102,10 +81,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <select name="profissional" class="form-select">
                     <option value="">Todos</option>
                     <?php foreach ($profissionais as $profissional): ?>
-                        <option value="<?= (int) $profissional['id'] ?>"
-                            <?= $filtroProfissional === (int) $profissional['id'] ? 'selected' : '' ?>>
-                            <?= e($profissional['nome']) ?>
-                        </option>
+                        <option value="<?= (int) $profissional['id'] ?>" <?= $filtroProfissional === (int) $profissional['id'] ? 'selected' : '' ?>><?= e($profissional['nome']) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -133,5 +109,38 @@ require_once __DIR__ . '/../includes/header.php';
             </thead>
             <tbody>
                 <?php if (empty($agendamentos)): ?>
+                    <tr><td colspan="6" class="text-center text-muted py-4">Nenhum agendamento encontrado.</td></tr>
+                <?php endif; ?>
+
+                <?php foreach ($agendamentos as $agendamento): ?>
+                    <?php $inicio = strtotime($agendamento['data_hora']); ?>
                     <tr>
-                        <td
+                        <td class="text-nowrap">
+                            <strong><?= date('d/m/Y', $inicio) ?></strong><br>
+                            <span class="small text-muted"><?= date('H:i', $inicio) ?> às <?= date('H:i', strtotime("+{$agendamento['duracao_minutos']} minutes", $inicio)) ?></span>
+                        </td>
+                        <td>
+                            <?= e($agendamento['paciente_nome']) ?><br>
+                            <span class="small text-muted"><?= e(formatarCpf($agendamento['paciente_cpf'])) ?></span>
+                        </td>
+                        <td><?= e($agendamento['profissional_nome']) ?></td>
+                        <td><?= e($agendamento['tipo_atendimento']) ?></td>
+                        <td><span class="badge text-bg-<?= $corStatus[$agendamento['status']] ?>"><?= ucfirst(e($agendamento['status'])) ?></span></td>
+                        <td class="text-end text-nowrap">
+                            <?php if ($agendamento['status'] === 'agendado'): ?>
+                                <a href="status.php?id=<?= (int) $agendamento['id'] ?>&acao=realizado&csrf_token=<?= e(tokenCsrf()) ?>" class="btn btn-sm btn-outline-success">Concluir</a>
+                                <a href="status.php?id=<?= (int) $agendamento['id'] ?>&acao=cancelado&csrf_token=<?= e(tokenCsrf()) ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Cancelar este agendamento?')">Cancelar</a>
+                            <?php else: ?>
+                                <span class="text-muted small">—</span>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<p class="text-center text-muted small mt-3"><?= count($agendamentos) ?> agendamento(s)</p>
+
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>

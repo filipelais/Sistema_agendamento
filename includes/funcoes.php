@@ -79,28 +79,29 @@ function validarCsrf(?string $token): bool {
 function e(?string $texto): string {
     return htmlspecialchars($texto ?? '', ENT_QUOTES, 'UTF-8');
 }
+
 /**
  * Verifica se já existe agendamento conflitante para o profissional
  * no intervalo informado.
  *
- * Dois atendimentos conflitam quando seus intervalos se sobrepõem.
- * Agendamentos cancelados são ignorados.
+ * Dois atendimentos conflitam quando seus intervalos se sobrepõem:
+ * inicioNovo < fimExistente E fimNovo > inicioExistente.
+ *
+ * Agendamentos cancelados são ignorados, pois liberam o horário.
+ *
+ * Observação: os placeholders :inicio_a e :inicio_b recebem o mesmo valor.
+ * Prepared statements nativos (EMULATE_PREPARES desativado) não permitem
+ * reutilizar o mesmo nome de parâmetro em posições diferentes.
  *
  * @param int|null $ignorarId ID a desconsiderar (usado na edição)
  */
-function existeConflito(
-    PDO $pdo,
-    int $usuarioId,
-    string $dataHora,
-    int $duracaoMinutos,
-    ?int $ignorarId = null
-): bool {
+function existeConflito(PDO $pdo, int $usuarioId, string $dataHora, int $duracaoMinutos, ?int $ignorarId = null): bool {
     $sql = "SELECT COUNT(*) AS total
             FROM agendamentos
             WHERE usuario_id = :usuario_id
               AND status <> 'cancelado'
-              AND :inicio < DATE_ADD(data_hora, INTERVAL duracao_minutos MINUTE)
-              AND DATE_ADD(:inicio, INTERVAL :duracao MINUTE) > data_hora";
+              AND :inicio_a < DATE_ADD(data_hora, INTERVAL duracao_minutos MINUTE)
+              AND DATE_ADD(:inicio_b, INTERVAL :duracao MINUTE) > data_hora";
 
     if ($ignorarId !== null) {
         $sql .= " AND id <> :ignorar_id";
@@ -108,7 +109,8 @@ function existeConflito(
 
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(':usuario_id', $usuarioId, PDO::PARAM_INT);
-    $stmt->bindValue(':inicio', $dataHora);
+    $stmt->bindValue(':inicio_a', $dataHora);
+    $stmt->bindValue(':inicio_b', $dataHora);
     $stmt->bindValue(':duracao', $duracaoMinutos, PDO::PARAM_INT);
 
     if ($ignorarId !== null) {

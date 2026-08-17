@@ -7,15 +7,7 @@ $profissionais = listarProfissionais($pdo);
 $pacientes = $pdo->query("SELECT id, nome, cpf FROM pacientes ORDER BY nome ASC")->fetchAll();
 
 $erros = [];
-$dados = [
-    'paciente_id' => '',
-    'usuario_id' => $_SESSION['usuario_id'],
-    'data' => '',
-    'hora' => '',
-    'duracao_minutos' => 30,
-    'tipo_atendimento' => '',
-    'observacoes' => ''
-];
+$dados = ['paciente_id' => '', 'usuario_id' => $_SESSION['usuario_id'], 'data' => '', 'hora' => '', 'duracao_minutos' => 30, 'tipo_atendimento' => '', 'observacoes' => ''];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!validarCsrf($_POST['csrf_token'] ?? null)) {
@@ -29,8 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dados['duracao_minutos'] = (int) ($_POST['duracao_minutos'] ?? 30);
     $dados['tipo_atendimento'] = trim($_POST['tipo_atendimento'] ?? '');
     $dados['observacoes'] = trim($_POST['observacoes'] ?? '');
-
-    // --- Validações ---
 
     if ($dados['paciente_id'] <= 0) {
         $erros['paciente_id'] = 'Selecione o paciente.';
@@ -52,7 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $erros['tipo_atendimento'] = 'Informe o tipo de atendimento.';
     }
 
-    // Validações que dependem da data/hora montada
     if (empty($erros)) {
         $dataHora = $dados['data'] . ' ' . $dados['hora'] . ':00';
 
@@ -63,28 +52,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // --- Gravação ---
-
     if (empty($erros)) {
-        $sql = "INSERT INTO agendamentos
-                    (paciente_id, usuario_id, data_hora, duracao_minutos, tipo_atendimento, observacoes)
-                VALUES
-                    (:paciente_id, :usuario_id, :data_hora, :duracao, :tipo, :observacoes)";
+        $sql = "INSERT INTO agendamentos (paciente_id, usuario_id, data_hora, duracao_minutos, tipo_atendimento, observacoes) VALUES (:paciente_id, :usuario_id, :data_hora, :duracao, :tipo, :observacoes)";
 
         try {
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([
-                ':paciente_id' => $dados['paciente_id'],
-                ':usuario_id' => $dados['usuario_id'],
-                ':data_hora' => $dataHora,
-                ':duracao' => $dados['duracao_minutos'],
-                ':tipo' => $dados['tipo_atendimento'],
-                ':observacoes' => $dados['observacoes'] ?: null
-            ]);
-
+            $stmt->execute([':paciente_id' => $dados['paciente_id'], ':usuario_id' => $dados['usuario_id'], ':data_hora' => $dataHora, ':duracao' => $dados['duracao_minutos'], ':tipo' => $dados['tipo_atendimento'], ':observacoes' => $dados['observacoes'] ?: null]);
             header('Location: listar.php?sucesso=cadastrado');
             exit;
-
         } catch (PDOException $e) {
             $erros['geral'] = 'Não foi possível registrar o agendamento.';
         }
@@ -108,10 +83,7 @@ require_once __DIR__ . '/../includes/header.php';
         <?php endif; ?>
 
         <?php if (empty($pacientes)): ?>
-            <div class="alert alert-warning">
-                Nenhum paciente cadastrado.
-                <a href="../pacientes/cadastrar.php" class="alert-link">Cadastre um paciente</a> antes de criar agendamentos.
-            </div>
+            <div class="alert alert-warning">Nenhum paciente cadastrado. <a href="../pacientes/cadastrar.php" class="alert-link">Cadastre um paciente</a> antes de criar agendamentos.</div>
         <?php endif; ?>
 
         <div class="card border-0 shadow-sm">
@@ -124,10 +96,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <select name="paciente_id" class="form-select <?= isset($erros['paciente_id']) ? 'is-invalid' : '' ?>" required>
                             <option value="">Selecione...</option>
                             <?php foreach ($pacientes as $paciente): ?>
-                                <option value="<?= (int) $paciente['id'] ?>"
-                                    <?= $dados['paciente_id'] == $paciente['id'] ? 'selected' : '' ?>>
-                                    <?= e($paciente['nome']) ?> — <?= e(formatarCpf($paciente['cpf'])) ?>
-                                </option>
+                                <option value="<?= (int) $paciente['id'] ?>" <?= $dados['paciente_id'] == $paciente['id'] ? 'selected' : '' ?>><?= e($paciente['nome']) ?> &mdash; <?= e(formatarCpf($paciente['cpf'])) ?></option>
                             <?php endforeach; ?>
                         </select>
                         <?php if (isset($erros['paciente_id'])): ?>
@@ -139,10 +108,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <label class="form-label">Profissional responsável *</label>
                         <select name="usuario_id" class="form-select <?= isset($erros['usuario_id']) ? 'is-invalid' : '' ?>" required>
                             <?php foreach ($profissionais as $profissional): ?>
-                                <option value="<?= (int) $profissional['id'] ?>"
-                                    <?= $dados['usuario_id'] == $profissional['id'] ? 'selected' : '' ?>>
-                                    <?= e($profissional['nome']) ?>
-                                </option>
+                                <option value="<?= (int) $profissional['id'] ?>" <?= $dados['usuario_id'] == $profissional['id'] ? 'selected' : '' ?>><?= e($profissional['nome']) ?></option>
                             <?php endforeach; ?>
                         </select>
                         <?php if (isset($erros['usuario_id'])): ?>
@@ -153,12 +119,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Data *</label>
-                            <input type="date"
-                                   name="data"
-                                   class="form-control <?= isset($erros['data']) ? 'is-invalid' : '' ?>"
-                                   value="<?= e($dados['data']) ?>"
-                                   min="<?= date('Y-m-d') ?>"
-                                   required>
+                            <input type="date" name="data" class="form-control <?= isset($erros['data']) ? 'is-invalid' : '' ?>" value="<?= e($dados['data']) ?>" min="<?= date('Y-m-d') ?>" required>
                             <?php if (isset($erros['data'])): ?>
                                 <div class="invalid-feedback"><?= e($erros['data']) ?></div>
                             <?php endif; ?>
@@ -166,12 +127,7 @@ require_once __DIR__ . '/../includes/header.php';
 
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Horário *</label>
-                            <input type="time"
-                                   name="hora"
-                                   class="form-control"
-                                   value="<?= e($dados['hora']) ?>"
-                                   step="900"
-                                   required>
+                            <input type="time" name="hora" class="form-control" value="<?= e($dados['hora']) ?>" step="900" required>
                             <div class="form-text">Intervalos de 15 minutos.</div>
                         </div>
 
@@ -179,4 +135,37 @@ require_once __DIR__ . '/../includes/header.php';
                             <label class="form-label">Duração (min) *</label>
                             <select name="duracao_minutos" class="form-select">
                                 <?php foreach ([15, 30, 45, 60, 90, 120] as $opcao): ?>
-                                    <option value="<?= $opcao ?>" <?= $dados['duracao_minutos'] == $opcao ? 'selected' : '' ?>>
+                                    <option value="<?= $opcao ?>" <?= $dados['duracao_minutos'] == $opcao ? 'selected' : '' ?>><?= $opcao ?> minutos</option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de atendimento *</label>
+                        <input type="text" name="tipo_atendimento" class="form-control <?= isset($erros['tipo_atendimento']) ? 'is-invalid' : '' ?>" value="<?= e($dados['tipo_atendimento']) ?>" list="tipos" required>
+                        <datalist id="tipos">
+                            <option value="Consulta">
+                            <option value="Retorno">
+                            <option value="Coleta de exame">
+                            <option value="Vacinação">
+                        </datalist>
+                        <?php if (isset($erros['tipo_atendimento'])): ?>
+                            <div class="invalid-feedback"><?= e($erros['tipo_atendimento']) ?></div>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Observações</label>
+                        <textarea name="observacoes" class="form-control" rows="3"><?= e($dados['observacoes']) ?></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" <?= empty($pacientes) ? 'disabled' : '' ?>>Agendar</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>

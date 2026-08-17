@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/auth_check.php';
 require_once __DIR__ . '/config/conexao.php';
-
+<a href="/sistema-agendamentos/pacientes/buscar.php" class="btn btn-outline-primary">Busca rápida</a>
 // Busca alguns números para o painel
 $totalPacientes = $pdo->query("SELECT COUNT(*) AS total FROM pacientes")->fetch()['total'];
 $totalAgendamentos = $pdo->query("SELECT COUNT(*) AS total FROM agendamentos WHERE status = 'agendado'")->fetch()['total'];

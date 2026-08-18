@@ -33,6 +33,8 @@ Foi construído sem frameworks, em PHP puro, com o objetivo de demonstrar domín
 - Dois perfis de acesso: administrador e atendente
 - Proteção de rotas por sessão
 - Regeneração de ID de sessão após autenticação
+- Gestão de usuários do sistema restrita a administradores
+- Ativação e desativação de acesso, preservando o histórico
 
 ### Gestão de pacientes
 - Cadastro com validação de CPF (dígitos verificadores)
@@ -377,6 +379,7 @@ sistema-agendamentos/
 - Implementar registro de auditoria das operações
 - Containerizar o ambiente com Docker e Docker Compose
 - Adicionar testes automatizados para as regras de negócio
+- Exigir a senha atual ao alterar a própria senha, em vez de permitir a troca direta pelo administrador
 
 ---
 

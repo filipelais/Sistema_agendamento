@@ -16,6 +16,9 @@ require_once __DIR__ . '/includes/header.php';
         <a href="/sistema-agendamentos/pacientes/listar.php" class="btn btn-outline-primary">Pacientes</a>
         <a href="/sistema-agendamentos/pacientes/buscar.php" class="btn btn-outline-primary">Busca rápida</a>
         <a href="/sistema-agendamentos/agendamentos/listar.php" class="btn btn-primary">Agendamentos</a>
+        <?php if (ehAdmin()): ?>
+            <a href="/sistema-agendamentos/usuarios/listar.php" class="btn btn-outline-secondary">Usuários</a>
+        <?php endif; ?>
     </div>
 </div>
 

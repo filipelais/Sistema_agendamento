@@ -4,7 +4,7 @@ Sistema web para gestão de pacientes e agendamento de atendimentos, desenvolvid
 
 ---
 
-## 📋 Sobre o projeto
+## Sobre o projeto
 
 O sistema permite que uma unidade de atendimento controle seu cadastro de pacientes e a agenda dos profissionais, com verificação automática de conflito de horários e acompanhamento da situação de cada atendimento.
 
@@ -12,7 +12,7 @@ Foi construído sem frameworks, em PHP puro, com o objetivo de demonstrar domín
 
 ---
 
-## 📸 Telas
+## Telas
 
 ### Painel de indicadores
 ![Painel de indicadores](docs/dashboard.png)
@@ -26,7 +26,7 @@ Foi construído sem frameworks, em PHP puro, com o objetivo de demonstrar domín
 ### Validação de dados
 ![Validação de CPF](docs/validacao.png)
 
-## ⚙️ Funcionalidades
+## Funcionalidades
 
 ### Autenticação e controle de acesso
 - Login com senha criptografada
@@ -56,7 +56,7 @@ Foi construído sem frameworks, em PHP puro, com o objetivo de demonstrar domín
 
 ---
 
-## 🔒 Segurança implementada
+## Segurança implementada
 
 | Vulnerabilidade | Proteção aplicada |
 |---|---|
@@ -72,7 +72,7 @@ Foi construído sem frameworks, em PHP puro, com o objetivo de demonstrar domín
 
 ---
 
-## 🛠️ Tecnologias utilizadas
+## Tecnologias utilizadas
 
 **Back-end**
 - PHP 8.2
@@ -90,7 +90,7 @@ Foi construído sem frameworks, em PHP puro, com o objetivo de demonstrar domín
 
 ---
 
-## 🗄️ Modelagem do banco de dados
+## Modelagem do banco de dados
 
 ```
 usuarios                pacientes               agendamentos
@@ -147,7 +147,7 @@ CREATE TABLE agendamentos (
 
 ---
 
-## 🔌 API REST
+## API REST
 
 O sistema expõe endpoints que retornam JSON, consumidos pelo próprio front-end e disponíveis para integração com outras aplicações.
 
@@ -229,7 +229,7 @@ Todos os endpoints exigem sessão ativa. Requisições não autenticadas recebem
 
 ---
 
-## 🧠 Decisões técnicas
+## Decisões técnicas
 
 Esta seção registra o raciocínio por trás das principais escolhas do projeto.
 
@@ -289,7 +289,7 @@ A consulta agrupada por dia retorna apenas as datas com registros. Dias sem agen
 
 ---
 
-## 📁 Estrutura do projeto
+## Estrutura do projeto
 
 ```
 sistema-agendamentos/
@@ -328,7 +328,7 @@ sistema-agendamentos/
 
 ---
 
-## ▶️ Como executar
+##  Como executar
 
 ### Requisitos
 - PHP 8.1 ou superior
@@ -372,7 +372,7 @@ sistema-agendamentos/
 
 ---
 
-## 🚧 Melhorias previstas
+## Melhorias previstas
 
 - Extrair as regras de validação para classes reutilizáveis, eliminando a duplicação entre formulários web e endpoints da API
 - Substituir as ações de exclusão e alteração de status por requisições POST, seguindo a semântica correta dos verbos HTTP
@@ -383,7 +383,7 @@ sistema-agendamentos/
 
 ---
 
-## 👤 Autor
+## Autor
 
-Desenvolvido por **Filipe Lais**
+Desenvolvido por **Filipe Alexandre**
 [github.com/filipelais](https://github.com/filipelais)

@@ -1,4 +1,4 @@
-# 🏥 Sistema de Agendamento de Atendimentos
+#  Sistema de Agendamento de Atendimentos
 
 Sistema web para gestão de pacientes e agendamento de atendimentos, desenvolvido em PHP com foco em segurança, integridade de dados e regras de negócio reais.
 
